@@ -1,0 +1,114 @@
+<ul class="nav nav-tabs justify-content-end">
+  <li class="nav-item" style="cursor: pointer">
+    <a class="nav-link text-primary" [ngClass]="{'active': modoAtivo == 1}" (click)="abrirAba(1)">Modo Plano de
+      Ensino</a>
+  </li>
+  <li class="nav-item" style="cursor: pointer">
+    <a class="nav-link text-primary" [ngClass]="{'active': modoAtivo == 0}" (click)="abrirAba(0)">Modo Gráfico</a>
+  </li>
+  <li class="nav-item" style="cursor: pointer">
+    <a class="nav-link text-primary" [ngClass]="{'active': modoAtivo == 2}" (click)="abrirAba(2)">Modo Trajetória</a>
+  </li>
+</ul>
+<div *ngIf="modoAtivo === 0">
+  <div class="spinner-grow text-info" role="status" *ngIf="carregandoBlocos">
+    <span class="sr-only">Loading...</span>
+  </div>
+
+  <ngx-blockly style="height: 95vh" [config]="config" *ngIf="carregouItems == true"
+               (workspaceChange)="onChange($event)"
+               [customBlocks]="geralCustomBlocks"></ngx-blockly>
+</div>
+<div *ngIf="modoAtivo ==  1">
+  <div align="right" style="margin-top: 5px">
+    <button class="btn btn-outline-info btn-sm" (click)="gerarDocPlano()">
+      <i class="fa fa-file-pdf"></i> Exportar para PDF
+    </button>
+  </div>
+  <h4>
+    {{dadosDisciplina.nome}}
+  </h4>
+  <b>Descrição:</b>
+  <div *ngIf="!editandoDescricao">
+    {{dadosDisciplina.descricao}}
+    <div align="right">
+      <button class="btn btn-link btn-sm" (click)="abrirEditarDescricao()">Editar Descrição</button>
+    </div>
+  </div>
+  <div *ngIf="editandoDescricao">
+    <div class="form-group">
+      <label for="exampleFormControlTextarea1">Descrição</label>
+      <textarea class="form-control" id="exampleFormControlTextarea1" [(ngModel)]="dadosDisciplina.descricao"
+                rows="3"></textarea>
+    </div>
+    <div align="right">
+      <button class="btn btn-success btn-sm" (click)="salvarEditarDescricao()">
+        Salvar
+      </button>
+    </div>
+  </div>
+  <hr>
+  <b>Ementa:</b>
+  <div *ngIf="!editandoEmenta">
+    {{dadosDisciplina.ementa}}
+    <div align="right">
+      <button class="btn btn-link btn-sm" (click)="abrirEditarEmenta()">Editar Ementa</button>
+    </div>
+  </div>
+  <div *ngIf="editandoEmenta">
+    <div class="form-group">
+      <label for="exampleFormControlTextarea1">Ementa</label>
+      <textarea class="form-control" [(ngModel)]="dadosDisciplina.ementa"
+                rows="3"></textarea>
+    </div>
+    <div align="right">
+      <button class="btn btn-success btn-sm" (click)="salvarEditarEmenta()">
+        Salvar
+      </button>
+    </div>
+  </div>
+  <hr>
+  <b>Objetivos:</b>
+  <div *ngIf="!editandoObjetivos">
+    {{dadosDisciplina.objetivos}}
+    <div align="right">
+      <button class="btn btn-link btn-sm" (click)="abrirEditarObjetivos()">Editar Objetivos</button>
+    </div>
+  </div>
+  <div *ngIf="editandoObjetivos">
+    <div class="form-group">
+      <label for="exampleFormControlTextarea1">Objetivos</label>
+      <textarea class="form-control" [(ngModel)]="dadosDisciplina.objetivos"
+                rows="3"></textarea>
+    </div>
+    <div align="right">
+      <button class="btn btn-success btn-sm" (click)="salvarEditarObjetivos()">
+        Salvar
+      </button>
+    </div>
+  </div>
+  <hr>
+  <b>Conteúdo:</b>
+  <div *ngFor="let item of dadosExibir; let i = index">
+    <b> {{ item.nome }}</b>
+    <div style="margin-left: 20px">
+      <div *ngFor="let itemRecurso of item.recursos">
+        {{itemRecurso.nome}} (Conceitos: {{itemRecurso.conceitos}})
+        <div style="margin-left: 20px">
+          <div *ngFor="let itemAvalicao of itemRecurso.avaliacoes">
+            {{itemAvalicao.nome}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="margin-left: 20px">
+      <div *ngFor="let itemAvalicao of item.avaliacoes">
+        {{itemAvalicao.nome}}
+      </div>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="modoAtivo ==  2">
+  <app-plan-exibir-trajetoria [dadosExibir]="dadosExibir"></app-plan-exibir-trajetoria>
+</div>

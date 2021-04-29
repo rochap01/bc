@@ -1,0 +1,55 @@
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+
+    <div class="displayTable">
+      <div class="displayTableCell">
+
+        <div class="row">
+          <div class="col-lg-3">
+
+          </div>
+          <div class="col-lg-6">
+
+            <div class="authBlock">
+              <h3>Criar Conta</h3>
+
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Nome Comnpleto" #userName required>
+              </div>
+
+              <div class="form-group">
+                <input type="email" class="form-control" placeholder="E-Mail" #userEmail required>
+              </div>
+
+              <div class="form-group">
+                <input type="password" class="form-control" placeholder="Senha" #userPwd required>
+              </div>
+
+
+              <div class="form-group">
+                <input type="button" class="btn btn-primary btn-block" value="Confirmar"
+                       [disabled]="authService.criando"
+                       (click)="authService.SignUp(userEmail.value, userPwd.value, userName.value)">
+              </div>
+
+              <div class="spinner-grow text-info" role="status" *ngIf="authService.criando">
+                <span class="sr-only">Loading...</span>
+              </div>
+
+            </div>
+
+            <div class="redirectToLogin">
+              <span>Já tem uma conta? <span class="redirect btn btn-link"
+                                            routerLink="/sign-in">Log In</span></span>
+            </div>
+          </div>
+          <div class="col-lg-3">
+
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</main>

@@ -1,0 +1,805 @@
+<div class="conteudo">
+  <br>
+  <div *ngIf="dadosPlanejamento && dadosDisciplina">
+    <h4>Planejamento da Disciplina ({{dadosDisciplina.nome}})</h4>
+    <hr>
+
+    <div class="row">
+      <div class="col-lg-5">
+
+        <div *ngIf="adicionandoEpisodio">
+          <div class="card">
+            <div class="card-header">
+              <div class="row">
+                <div class="col-8">
+                  <b>
+                    Adicionar Unidade
+                  </b>
+                </div>
+                <div class="col-4">
+                  <div align="right">
+                    <button class="btn btn-sm btn-outline-info" (click)="fecharAdicionarEpisodio()">
+                      <i class="fa fa-times"></i> Fechar
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+            <div class="card-body">
+
+              <div class="form-group">
+                <label>Nome</label>
+                <input type="text" class="form-control"
+                       [(ngModel)]="novoEpisodio.nome"
+                       aria-describedby="emailHelp" placeholder="Nome da Unidade">
+              </div>
+              <div class="form-group">
+                <label>Descrição</label>
+                <ckeditor [editor]="Editor" [config]="config" (ready)="onReady($event)"
+                          [(ngModel)]="novoEpisodio.descricao"></ckeditor>
+              </div>
+
+              <div class="form-check">
+                <input class="form-check-input" [(ngModel)]="novoEpisodio.pontoChegada" type="checkbox" value=""
+                       id="defaultCheck1">
+                <label class="form-check-label" for="defaultCheck1">
+                  É um ponto de chegada?
+                  <small id="emailHelp" class="form-text text-muted">
+                    O Ponto de Chegada é o conjunto de conceitos e proposições relacionados aos objetivos educacionais.
+                  </small>
+                </label>
+              </div>
+
+
+              <div align="right">
+                <button class="btn btn-success" (click)="salvarEpisodio()">
+                  Salvar Unidade
+                </button>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+        <div *ngIf="!adicionandoEpisodio">
+          <div align="right" style="margin-bottom: 5px">
+
+            <button class="btn btn-success btn-sm" (click)="abrirAdicionarEpisodio()"
+                    *ngIf="dadosPlanejamento.user_id === authenticationService.getUID">
+              <i class="fa fa-plus"></i> Adicionar Unidade
+            </button>
+          </div>
+          <div class="coluna2">
+
+            <div class="spinner-grow text-info" role="status" *ngIf="loadingEpisodios">
+              <span class="sr-only">Loading...</span>
+            </div>
+
+            <div class="card" *ngFor="let item of dadosEpisodios; let i = index">
+              <div class="card-header" style="cursor: pointer; background: #a1a1a1"
+                   (click)="abrirEpisodio(i, item.payload.doc.id)">
+                <div class="row">
+                  <div class="col-8">
+                    <b>
+                      <a title="Editar Unidade" class="text-primary" (click)="abrirEditarUnidade()"
+                         *ngIf="i== episodioSelecionado"><i
+                        class="fa fa-edit"></i></a> {{ item.payload.doc.data().nome }}
+                    </b>
+                  </div>
+                  <div class="col-4">
+                    <div align="right">
+                      <i class="fa fa-plus" *ngIf="i != episodioSelecionado"></i>
+                      <button class="btn btn-sm btn-link text-danger" (click)="apagarUnidade(item.payload.doc.id)"
+                              style="font-size: small" *ngIf="i== episodioSelecionado">
+                        <i class="fa fa-trash"></i> Remover unidade
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="card-body" *ngIf="i == episodioSelecionado">
+                <div
+                  *ngIf="!novaDependenciaAberta && !novoRecursoAberto && !novaAvaliacaoAberta && !definindoConteudoAberto && !novaDependenciaAbertaRecurso">
+                  <ul class="nav nav-tabs">
+                    <li class="nav-item" style="cursor: pointer" (click)="ativarAbaInterna(1)">
+                      <a class="nav-link text-primary" [ngClass]="{'active': abaInternaEpisodio === 1}">Dependências
+                        (unidade)</a>
+                    </li>
+                    <li class="nav-item" style="cursor: pointer" (click)="ativarAbaInterna(2)">
+                      <a class="nav-link text-primary" [ngClass]="{'active': abaInternaEpisodio === 2}">Aulas</a>
+                    </li>
+                    <li class="nav-item" style="cursor: pointer" (click)="ativarAbaInterna(3)">
+                      <a class="nav-link text-primary" [ngClass]="{'active': abaInternaEpisodio === 3}">Avaliações
+                        (unidade)</a>
+                    </li>
+                  </ul>
+
+                  <div *ngIf="abaInternaEpisodio == 1">
+                    <div>
+                      <b>Dependências para {{ item.payload.doc.data().nome }}:</b>
+                    </div>
+                    <div align="right" style="margin-bottom: 5px">
+                      <button class="btn btn-outline-success btn-sm" (click)="abrirNovoDependencia()"
+                              *ngIf="dadosPlanejamento.user_id === authenticationService.getUID">
+                        <i class="fa fa-plus"></i> Adicionar Dependência
+                      </button>
+                    </div>
+                    <div class="conteudoInternoTopico">
+                      <div class="spinner-grow text-info" role="status" *ngIf="loadingDependencias">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                      <div class="alert alert-primary" role="alert"
+                           *ngIf="dadosDependencias && dadosDependencias.length <= 0">
+                        Nenhuma dependência cadastrada.
+                      </div>
+                      <span *ngFor="let itemDependencia of dadosDependencias; let iDependencia = index">
+                      <span class="badge badge-secondary" style="margin-right: 2px"
+                            *ngIf="itemDependencia.payload.doc.data().episodio_pai == item.payload.doc.id">
+                                {{itemDependencia.payload.doc.data().nomeEpisodioDependente}} <i class="fa fa-trash "
+                                                                                                 *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                                                                                                 (click)="apagarDependencia(itemDependencia.payload.doc.id)"
+                                                                                                 style="color: #ffc5d4;cursor: pointer"></i>
+                              </span>
+                      </span>
+                    </div>
+                  </div>
+
+                  <div *ngIf="abaInternaEpisodio == 2">
+                    <div>
+                      <b>Aulas para {{ item.payload.doc.data().nome }}:</b>
+                    </div>
+                    <div align="right" style="margin-bottom: 5px">
+                      <button class="btn btn-outline-success btn-sm" (click)="abrirNovoRecurso()"
+                              *ngIf="dadosPlanejamento.user_id === authenticationService.getUID">
+                        <i class="fa fa-plus"></i> Adicionar Aula
+                      </button>
+                    </div>
+                    <div class="conteudoInternoTopico">
+                      <div class="spinner-grow text-info" role="status" *ngIf="loadingRecursos">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                      <div class="alert alert-primary" role="alert" *ngIf="dadosRecursos.length <= 0">
+                        Nenhum recurso cadastrado.
+                      </div>
+                      <div *ngFor="let item of dadosRecursos; let i = index">
+                        <div *ngIf="item.payload.doc.data().episodio_pai == idEpisodioSelecionado">
+
+                          <div class="card" style="margin-bottom: 5px">
+                            <div class="card-header" style="cursor: pointer; background: #a1a1a1"
+                                 (click)="expandirRecurso(item.payload.doc.id)">
+                              <div class="row">
+                                <div class="col-7">
+                                  <a title="Editar Unidade" class="text-primary" (click)="abrirEditarUnidade()"
+                                     *ngIf="item.payload.doc.id == idRecursoAberto"><i
+                                    class="fa fa-edit"></i></a>   {{item.payload.doc.data().nome}}
+                                  - {{ item.payload.doc.data().tempo }} {{ item.payload.doc.data().tempoTipo }}
+                                </div>
+                                <div class="col-5">
+                                  <div align="right">
+                                    <i class="fa fa-plus" *ngIf="item.payload.doc.id != idRecursoAberto"></i>
+                                    <button class="btn btn-sm btn-link text-danger"
+                                            (click)="apagarAula(item.payload.doc.id)"
+                                            style="font-size: small" *ngIf="item.payload.doc.id == idRecursoAberto">
+                                      <i class="fa fa-trash"></i> Remover aula
+                                    </button>
+                                    <i class="fa fa-minus" *ngIf="item.payload.doc.id == idRecursoAberto"></i>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="card-body" *ngIf="item.payload.doc.id == idRecursoAberto">
+
+                              <div class="row">
+
+                                <div class="col-lg-12">
+
+                                  <div class="card">
+                                    <div class="card-header">
+                                      Lista de Conceitos para "{{item.payload.doc.data().nome}}"
+
+                                    </div>
+                                    <div class="card-body">
+                                 <span class="badge badge-secondary" style="margin-right: 2px"
+                                       *ngFor="let itemConceito of item.payload.doc.data().conceitos; let iConceito = index">
+                                {{itemConceito}} <i class="fa fa-trash "
+                                                    *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                                                    (click)="apagarConceitoRecurso(iConceito, item.payload.doc.id, item.payload.doc.data().conceitos)"
+                                                    style="color: #ffc5d4;cursor: pointer"></i>
+                              </span>
+                                    </div>
+                                  </div>
+
+
+                                  <div align="right">
+                                    <button class="btn btn-link text-success btn-sm"
+                                            *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                                            (click)="adicionarConceitoParaRecurso(item.payload.doc.id, item.payload.doc.data().conceitos)">
+                                      <i class="fa fa-plus-circle"></i> Adicionar Conceito
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                              <hr>
+                              <div class="row">
+
+                                <div class="col-lg-12">
+
+                                  <div class="card">
+                                    <div class="card-header">
+                                      <div class="row">
+                                        <div class="col-12">
+                                          Lista de Dependências para "{{item.payload.doc.data().nome}}"
+                                        </div>
+
+                                      </div>
+                                    </div>
+                                    <div class="card-body">
+                                      <div class="spinner-grow text-info" role="status"
+                                           *ngIf="loadingDependenciasRecurso">
+                                        <span class="sr-only">Loading...</span>
+                                      </div>
+                                      <div class="alert alert-primary" role="alert"
+                                           *ngIf="dadosDependenciasRecurso.length <= 0">
+                                        Nenhuma Dependências cadastrada.
+                                      </div>
+                                      <span *ngFor="let itemRecurso of dadosDependenciasRecurso; let iRecurso = index">
+                                  <span class="badge badge-secondary"
+                                        *ngIf="itemRecurso.payload.doc.data().recurso_pai == item.payload.doc.id"
+                                        style="margin-right: 2px">
+                                                            {{itemRecurso.payload.doc.data().nomeRecursoDependente}} <i
+                                    class="fa fa-trash "
+                                    *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                                    (click)="apagarDependenciaRecurso(itemRecurso.payload.doc.id)"
+                                    style="color: #ffc5d4;cursor: pointer"></i>
+                              </span>
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div align="right">
+                                    <button class="btn btn-link text-success btn-sm"
+                                            *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                                            (click)="abrirNovoDependenciaRecurso(item.payload.doc.id)">
+                                      <i class="fa fa-plus-circle"></i> Adicionar Dependência
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+
+                              <hr>
+
+                              <div class="row">
+
+                                <div class="col-lg-12">
+
+                                  <div class="card">
+                                    <div class="card-header">
+                                      Lista de Avaliações para "{{item.payload.doc.data().nome}}"
+                                    </div>
+                                    <div class="card-body">
+                                      <div *ngIf="!novaAvaliacaoRecursoAberta">
+                                        <div class="spinner-grow text-info" role="status"
+                                             *ngIf="loadingAvaliacoesRecurso">
+                                          <span class="sr-only">Loading...</span>
+                                        </div>
+                                        <div class="alert alert-primary" role="alert"
+                                             *ngIf="dadosDependenciasRecurso.length <= 0">
+                                          Nenhuma Avaliação cadastrada.
+                                        </div>
+                                        <span *ngFor="let itemRecurso of dadosAvaliacoesRecurso; let iRecurso = index">
+                                  <span class="badge badge-secondary"
+                                        *ngIf="itemRecurso.payload.doc.data().recurso_pai == item.payload.doc.id"
+                                        style="margin-right: 2px">
+                                                            {{itemRecurso.payload.doc.data().nome}} <i
+                                    class="fa fa-trash "
+                                    *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                                    (click)="apagarAvaliacaoRecurso(itemRecurso.payload.doc.id)"
+                                    style="color: #ffc5d4;cursor: pointer"></i>
+                              </span>
+                                      </span>
+                                      </div>
+                                      <div *ngIf="novaAvaliacaoRecursoAberta">
+                                        <div class="card border-primary">
+                                          <div class="card-header">
+
+                                            <div class="row">
+                                              <div class="col-8">
+                                                <b>
+                                                  Nova Avaliação para Recurso
+                                                </b>
+                                              </div>
+                                              <div class="col-4">
+                                                <div align="right">
+                                                  <button class="btn btn-outline-danger btn-sm"
+                                                          (click)="fecharNovoAvaliacaoRecurso()">
+                                                    <i class="fa fa-times"></i>
+                                                  </button>
+                                                </div>
+                                              </div>
+                                            </div>
+
+                                          </div>
+                                          <div class="card-body">
+
+
+                                            <div class="form-group">
+                                              <label>
+                                                Título da Avaliação
+                                              </label>
+                                              <input type="text" class="form-control"
+                                                     [(ngModel)]="novaAvaliacaoRecursoNome"
+                                                     aria-describedby="emailHelp"
+                                                     placeholder="Título da Avaliação">
+                                            </div>
+
+                                            <div class="row">
+                                              <div class="col-lg-6">
+                                                <div class="form-group">
+                                                  <label>
+                                                    Tempo
+                                                  </label>
+                                                  <input type="number" [(ngModel)]="novaAvaliacaoRecursoTempo"
+                                                         class="form-control"
+                                                         aria-describedby="emailHelp"
+                                                         placeholder="Tempo">
+
+                                                </div>
+                                              </div>
+
+                                              <div class="col-lg-6">
+                                                <div class="form-group">
+                                                  <label>Tipo</label>
+                                                  <select class="form-control"
+                                                          [(ngModel)]="novaAvaliacaoRecursoTempoTipo">
+                                                    <option value="">Selecione o Tempo</option>
+                                                    <option value="minutos">Minutos</option>
+                                                    <option value="horas" selected>Horas</option>
+                                                    <option value="dias">Dias</option>
+                                                    <option value="meses">Meses</option>
+                                                  </select>
+                                                </div>
+                                              </div>
+
+                                              <div class="form-group">
+                                                <label>
+                                                  Descrição
+                                                </label>
+                                                <ckeditor [editor]="Editor" [config]="config" (ready)="onReady($event)"
+                                                          [(ngModel)]="novaAvaliacaoRecursoDescricao"></ckeditor>
+
+                                              </div>
+                                            </div>
+                                            <div align="right">
+                                              <button class="btn btn-success" (click)="salvarNovaAvaliacaoRecurso()">
+                                                Salvar
+                                              </button>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </div>
+
+
+                                    </div>
+                                  </div>
+
+                                  <div align="right">
+                                    <button class="btn btn-link text-success btn-sm"
+                                            *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                                            (click)="abrirNovoAvaliacaoRecurso(item.payload.doc.id)">
+                                      <i class="fa fa-plus-circle"></i> Adicionar Avaliação
+                                    </button>
+                                  </div>
+
+                                </div>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div *ngIf="abaInternaEpisodio == 3">
+                    <div>
+                      <b>Avaliações para {{ item.payload.doc.data().nome }}:</b>
+                    </div>
+                    <div align="right" style="margin-bottom: 5px">
+                      <button class="btn btn-outline-success btn-sm" (click)="abrirNovoAvaliacao()"
+                              *ngIf="dadosPlanejamento.user_id === authenticationService.getUID">
+                        <i class="fa fa-plus"></i> Adicionar Avaliação
+                      </button>
+                    </div>
+                    <div class="conteudoInternoTopico">
+                      <div class="spinner-grow text-info" role="status" *ngIf="loadingAvaliacoes">
+                        <span class="sr-only">Loading...</span>
+                      </div>
+                      <div class="alert alert-primary" role="alert" *ngIf="dadosAvaliacao.length <= 0">
+                        Nenhuma avaliação cadastrada.
+                      </div>
+                      <span *ngFor="let itemAvaliacao of dadosAvaliacao; let i = index" style="margin-right: 5px">
+                      <span class="badge badge-secondary"
+                            *ngIf="itemAvaliacao.payload.doc.data().episodio_pai == idEpisodioSelecionado">
+                        {{ itemAvaliacao.payload.doc.data().nome }}
+                        <i class="fa fa-trash "
+                           *ngIf="dadosPlanejamento.user_id === authenticationService.getUID"
+                           (click)="apagarAvaliacao(itemAvaliacao.payload.doc.id)"
+                           style="color: #ffc5d4;cursor: pointer"></i>
+                      </span>
+                    </span>
+
+
+                    </div>
+                  </div>
+
+                </div>
+
+
+                <div *ngIf="novaDependenciaAberta">
+                  <div class="card border-primary">
+                    <div class="card-header">
+
+                      <div class="row">
+                        <div class="col-8">
+                          <b>
+                            Nova Unidade Dependente
+                          </b>
+                        </div>
+                        <div class="col-4">
+                          <div align="right">
+                            <button class="btn btn-outline-danger btn-sm" (click)="fecharNovoDependencia()">
+                              <i class="fa fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="card-body">
+
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">
+                          Unidade Dependente
+                        </label>
+                        <select class="form-control" id="exampleFormControlSelect1"
+                                [(ngModel)]="novaDependenciaSelecionado">
+                          <option value="">Selecione uma Unidade</option>
+                          <option *ngFor="let item of dadosEpisodios; let i = index" [value]="item.payload.doc.id">
+                            {{item.payload.doc.data().nome}}
+                          </option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">
+                          Grau de Aderencia:
+                        </label>
+                        <select class="form-control" [(ngModel)]="novoDependenciaGrau">
+                          <option value="">Selecione um Grau</option>
+                          <option value="1">Fraco</option>
+                          <option value="2">Moderado</option>
+                          <option value="3">Forte</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label>Descrição</label>
+                        <ckeditor [editor]="Editor" [config]="config" (ready)="onReady($event)"
+                                  [(ngModel)]="novoDependenciaDescricao"></ckeditor>
+                      </div>
+
+                      <div align="right">
+                        <button class="btn btn-success" (click)="salvarNovaDependencia()">
+                          Salvar
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+                <div *ngIf="novaDependenciaAbertaRecurso">
+                  <div class="card border-primary">
+                    <div class="card-header">
+
+                      <div class="row">
+                        <div class="col-8">
+                          <b>
+                            Novo Recurso Dependente
+                          </b>
+                        </div>
+                        <div class="col-4">
+                          <div align="right">
+                            <button class="btn btn-outline-danger btn-sm" (click)="fecharNovoDependenciaRecurso()">
+                              <i class="fa fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="card-body">
+
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">
+                          Recurso Dependente
+                        </label>
+                        <select class="form-control"
+                                [(ngModel)]="novaDependenciaSelecionadoRecurso">
+                          <option value="">Selecione um Recurso</option>
+                          <option *ngFor="let item of dadosRecursos; let i = index" [value]="item.payload.doc.id">
+                            {{item.payload.doc.data().nome}}
+                          </option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="exampleFormControlSelect1">
+                          Grau de Aderencia:
+                        </label>
+                        <select class="form-control" [(ngModel)]="novoDependenciaGrauRecurso">
+                          <option value="">Selecione um Grau</option>
+                          <option value="1">Fraco</option>
+                          <option value="2">Moderado</option>
+                          <option value="3">Forte</option>
+                        </select>
+                      </div>
+
+                      <div class="form-group">
+                        <label>Descrição</label>
+                        <ckeditor [editor]="Editor" [config]="config" (ready)="onReady($event)"
+                                  [(ngModel)]="novoDependenciaDescricaoRecurso"></ckeditor>
+                      </div>
+
+
+                      <div align="right">
+                        <button class="btn btn-success" (click)="salvarNovaDependenciaRecurso()">
+                          Salvar
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+
+                </div>
+
+                <div *ngIf="definindoConteudoAberto">
+                  <div class="card border-primary">
+                    <div class="card-header">
+
+                      <div class="row">
+                        <div class="col-8">
+                          <b>
+                            Editar Conteúdo do Recurso Educacional
+                          </b>
+                        </div>
+                        <div class="col-4">
+                          <div align="right">
+                            <button class="btn btn-outline-danger btn-sm">
+                              <i class="fa fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="card-body">
+
+                      <div *ngIf="!definindoConteudoTipo || definindoConteudoTipo === ''">
+                        <b style="color: red;">Selecione o tipo do conteúdo:</b><br>
+                        <h6 style="cursor: pointer">
+                          <span class="badge badge-pill badge-info" (click)="definirTipoRecurso('html')"
+                                style="margin-right: 3px">
+                            Texto HTML
+                          </span>
+                          <span class="badge badge-pill badge-info" (click)="definirTipoRecurso('youtube')"
+                                style="margin-right: 3px">
+                            Vídeo do Youtube
+                          </span>
+                          <span class="badge badge-pill badge-info" (click)="definirTipoRecurso('imagem')"
+                                style="margin-right: 3px">
+                            Imagem
+                          </span>
+                          <span class="badge badge-pill badge-info"
+                                (click)="definirTipoRecurso('pdf')"
+                                style="margin-right: 3px">
+                            Arquivo PDF
+                          </span>
+                          <span class="badge badge-pill badge-info"
+                                (click)="definirTipoRecurso('slide')"
+                                style="margin-right: 3px">
+                            Slides
+                          </span>
+                          <span class="badge badge-pill badge-info"
+                                (click)="definirTipoRecurso('arquivo')"
+                                style="margin-right: 3px">
+                            Arquivo
+                          </span>
+                          <span class="badge badge-pill badge-info"
+                                (click)="definirTipoRecurso('embed')"
+                                style="margin-right: 3px">
+                            URL Externa (Embed)
+                          </span>
+                        </h6>
+                      </div>
+
+                      <div *ngIf="definindoConteudoTipo && definindoConteudoTipo !== ''">
+                        <div align="right">
+                          {{definindoConteudoTipo}}
+                        </div>
+                        <div style="color: red;">
+                          Edição de Recurso não disponível nesta versão do BlocoConceitual
+                        </div>
+                      </div>
+
+
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="novoRecursoAberto">
+                  <div class="card border-primary">
+                    <div class="card-header">
+
+                      <div class="row">
+                        <div class="col-8">
+                          <b>
+                            Nova Aula para o Unidade
+                          </b>
+                        </div>
+                        <div class="col-4">
+                          <div align="right">
+                            <button class="btn btn-outline-danger btn-sm" (click)="fecharNovoRecurso()">
+                              <i class="fa fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                    </div>
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label>
+                          Título do Recurso
+                        </label>
+                        <input type="text" class="form-control" [(ngModel)]="novoRecursoNome"
+                               aria-describedby="emailHelp"
+                               placeholder="Título do Recurso">
+
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label>
+                              Tempo
+                            </label>
+                            <input type="number" [(ngModel)]="novoRecursoTempo" class="form-control"
+                                   aria-describedby="emailHelp"
+                                   placeholder="Tempo">
+
+                          </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label>Tipo</label>
+                            <select class="form-control" [(ngModel)]="novoRecursoTempoTipo">
+                              <option value="">Selecione o Tempo</option>
+                              <option value="minutos">Minutos</option>
+                              <option value="horas" selected>Horas</option>
+                              <option value="dias">Dias</option>
+                              <option value="meses">Meses</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label>
+                            Descrição
+                          </label>
+                          <ckeditor [editor]="Editor" [config]="config" (ready)="onReady($event)"
+                                    [(ngModel)]="novoRecursoDescricao"></ckeditor>
+
+                        </div>
+                      </div>
+                      <div align="right">
+                        <button class="btn btn-success" (click)="salvarNovoRecurso()">
+                          Salvar
+                        </button>
+                      </div>
+
+
+                    </div>
+                  </div>
+                </div>
+
+                <div *ngIf="novaAvaliacaoAberta">
+                  <div class="card border-primary">
+                    <div class="card-header">
+                      <div class="row">
+                        <div class="col-8">
+                          <b>
+                            Nova Avaliação para a Unidade
+                          </b>
+                        </div>
+                        <div class="col-4">
+                          <div align="right">
+                            <button class="btn btn-outline-danger btn-sm" (click)="fecharNovoAvaliacao()">
+                              <i class="fa fa-times"></i>
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label>
+                          Título da Avaliação
+                        </label>
+                        <input type="text" class="form-control" [(ngModel)]="novaAvaliacaoNome"
+                               aria-describedby="emailHelp"
+                               placeholder="Título da Avaliação">
+                      </div>
+
+                      <div class="row">
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label>
+                              Tempo
+                            </label>
+                            <input type="number" [(ngModel)]="novaAvaliacaoTempo" class="form-control"
+                                   aria-describedby="emailHelp"
+                                   placeholder="Tempo">
+
+                          </div>
+                        </div>
+
+                        <div class="col-lg-6">
+                          <div class="form-group">
+                            <label>Tipo</label>
+                            <select class="form-control" [(ngModel)]="novaAvaliacaoTempoTipo">
+                              <option value="">Selecione o Tempo</option>
+                              <option value="minutos">Minutos</option>
+                              <option value="horas" selected>Horas</option>
+                              <option value="dias">Dias</option>
+                              <option value="meses">Meses</option>
+                            </select>
+                          </div>
+                        </div>
+
+                        <div class="form-group">
+                          <label>
+                            Descrição
+                          </label>
+                          <ckeditor [editor]="Editor" [config]="config" (ready)="onReady($event)"
+                                    [(ngModel)]="novaAvaliacaoDescricao"></ckeditor>
+
+                        </div>
+                      </div>
+                      <div align="right">
+                        <button class="btn btn-success" (click)="salvarNovaAvaliacao()">
+                          Salvar
+                        </button>
+                      </div>
+
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-7">
+        <app-plan-exibir-grafico [dadosEpisodios]="dadosEpisodios" [dadosRecursos]="dadosRecursos"
+                                 [dadosDependenicasRecursos]="dadosDependenciasRecurso"
+                                 [dadosDisciplina]="dadosDisciplina"
+                                 [dadosAvaliacoes]="dadosAvaliacao" [idDisciplina]="idDisciplina"
+                                 [dadosAvaliacoesRecurso]="dadosAvaliacoesRecurso"
+                                 [dadosDependenicasEpisodios]="dadosDependencias"></app-plan-exibir-grafico>
+      </div>
+    </div>
+    <br>
+  </div>
+</div>

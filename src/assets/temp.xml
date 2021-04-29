@@ -1,0 +1,77 @@
+<xml xmlns="http://www.w3.org/1999/xhtml">(main-es2015.4a165a70c1e3d6ccd8cb.js, line 1)
+  <variables></variables>
+  <block type="episodioeMH7QvnGdOfTEa1u9koY" id="eMH7QvnGdOfTEa1u9koY" x="169" y="87">
+    <statement name="ep_recurso_area">
+      <block type="recursorNT3yVJQpAI8DcpsfKle" id="rNT3yVJQpAI8DcpsfKle">
+        <field name="tempo_numero">1</field>
+        <field name="tempo">dia</field>
+        <next>
+          <block type="recurson1nVBVumUDHBP2s3w6n2" id="n1nVBVumUDHBP2s3w6n2">
+            <field name="tempo_numero">1</field>
+            <field name="tempo">dia</field>
+          </block>
+        </next>
+      </block>
+    </statement>
+  </block>
+</xml>
+
+
+
+<!--com tudo -->
+<xml xmlns="http://www.w3.org/1999/xhtml">
+<variables></variables>
+<block type="episodioeMH7QvnGdOfTEa1u9koY" id="eMH7QvnGdOfTEa1u9koY" x="169" y="87">
+  <statement name="ep_dependencia_area">
+    <block type="dependenciaeMH7QvnGdOfTEa1u9koY" id="$0ywVK`TS7.COarDSm~O">
+      <field name="tipo">2</field>
+      <next>
+        <block type="dependenciagI8JfLImdv2AtiaosG0W" id="gI8JfLImdv2AtiaosG0W">
+          <field name="tipo">2</field>
+        </block>
+      </next>
+    </block>
+  </statement>
+  <statement name="ep_recurso_area">
+    <block type="recursorNT3yVJQpAI8DcpsfKle" id="rNT3yVJQpAI8DcpsfKle">
+      <field name="tempo_numero">1</field>
+      <field name="tempo">dia</field>
+      <next>
+        <block type="recurson1nVBVumUDHBP2s3w6n2" id="n1nVBVumUDHBP2s3w6n2">
+          <field name="tempo_numero">1</field>
+          <field name="tempo">dia</field>
+        </block>
+      </next>
+    </block>
+  </statement>
+  <statement name="ep_avaliacao_area">
+    <block type="conceitoT9ECpnF99733hm1ETUlX" id="T9ECpnF99733hm1ETUlX"></block>
+  </statement>
+</block>
+</xml>
+
+<!-- com 3 recursos -->
+
+  [Log] <xml xmlns="http://www.w3.org/1999/xhtml"> (main-es2015.4a165a70c1e3d6ccd8cb.js, line 1)
+<variables></variables>
+<block type="episodioeMH7QvnGdOfTEa1u9koY" id="eMH7QvnGdOfTEa1u9koY" x="169" y="87">
+  <statement name="ep_recurso_area">
+    <block type="recursorNT3yVJQpAI8DcpsfKle" id="rNT3yVJQpAI8DcpsfKle">
+      <field name="tempo_numero">1</field>
+      <field name="tempo">dia</field>
+      <next>
+        <block type="recursorNT3yVJQpAI8DcpsfKle" id="uSQ5/E7^!3m5mXt}{$3A">
+          <field name="tempo_numero">1</field>
+          <field name="tempo">dia</field>
+          <next>
+            <block type="recursoeEKxNfwlYWTY5GRqJn7N" id="eEKxNfwlYWTY5GRqJn7N">
+              <field name="tempo_numero">1</field>
+              <field name="tempo">dia</field>
+            </block>
+          </next>
+        </block>
+      </next>
+    </block>
+  </statement>
+</block>
+</xml>

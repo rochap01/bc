@@ -1,0 +1,119 @@
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+
+    <br>
+    <div *ngIf="!temNome" class="card">
+      <div class="card-header">
+        <b>
+          Complete seu cadastro: Informe seu nome completo
+        </b>
+      </div>
+      <div class="card-body">
+        <div class="form-group">
+          <input type="text" class="form-control" [(ngModel)]="nomeCompleto" id="exampleInputEmail1"
+                 aria-describedby="emailHelp"
+                 placeholder="Nome Completo">
+          <small id="emailHelp" class="form-text text-muted">
+            Informe seu nome completo
+          </small>
+        </div>
+        <div align="right">
+          <button class="btn btn-success" (click)="salvarNome()">
+            Salvar
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!adicionandoDisciplina">
+      <h5>Minhas Disciplinas</h5>
+      <div align="right" style="margin-bottom: 10px">
+        <button class="btn btn-success" (click)="abrirAdicionarDisciplina()">Adicionar Disciplina</button>
+      </div>
+      <div *ngIf="dadosDisciplinas">
+        <table class="table">
+          <thead>
+          <tr>
+            <th scope="col">Nome</th>
+            <th scope="col">#</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr *ngFor="let item of dadosDisciplinas">
+            <td>
+              {{ item.payload.doc.data().nome }}
+            </td>
+
+            <td>
+              <button class="btn btn-primary btn-sm" [routerLink]="['/prof/plan', item.payload.doc.id]">
+                Planejamento da Disciplina
+              </button>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+
+    <div *ngIf="adicionandoDisciplina">
+      <div class="card">
+        <div class="card-header">
+          <div class="row">
+            <div class="col-8">
+              <b>
+                Adicionar Disciplina
+              </b>
+            </div>
+            <div class="col-4">
+              <div align="right">
+                <button class="btn btn-outline-primary btn-sm" (click)="fecharAdicionarDisciplina()">Fechar</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="form-group">
+            <label for="exampleInputEmail1">Nome da Disciplina</label>
+            <input type="text" class="form-control" [(ngModel)]="novoDisciplinaNome" aria-describedby="emailHelp"
+                   placeholder="Nome da Disciplina">
+
+          </div>
+
+          <div class="form-group">
+            <label for="exampleFormControlTextarea1">Descrição</label>
+            <textarea class="form-control" id="exampleFormControlTextarea1" [(ngModel)]="novoDisciplinaDescricao"
+                      rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="exampleFormControlTextarea1">Objetivos</label>
+            <textarea class="form-control"  [(ngModel)]="novoDisciplinaObjetivos"
+                      rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="exampleFormControlTextarea1">Ementa</label>
+            <textarea class="form-control"  [(ngModel)]="novoDisciplinaEmenta"
+                      rows="3"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="exampleInputEmail1">Carga Horária</label>
+            <input type="number" class="form-control" [(ngModel)]="novoDisciplinaCH" aria-describedby="emailHelp"
+                   placeholder="Carga horária">
+
+          </div>
+
+
+          <div align="right">
+            <button class="btn btn-success" (click)="salvarNovaDisciplina()">
+              Salvar
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</main>

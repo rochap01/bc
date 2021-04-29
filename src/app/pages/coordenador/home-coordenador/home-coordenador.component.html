@@ -1,0 +1,68 @@
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+    <br>
+    <h1>
+      Lista de Professores
+    </h1>
+
+    <div class="spinner-grow text-info" role="status" *ngIf="loading">
+      <span class="sr-only">Loading...</span>
+    </div>
+
+    <div *ngIf="dadosProfessores">
+      <div *ngFor="let item of dadosProfessores; let i = index">
+
+        <div class="card" *ngIf=" item.payload.doc.data().email !='coordenador@blococonceitual.com'">
+          <div class="card-header">
+            <div class="row">
+              <div class="col-8">
+                <b>
+                  {{ item.payload.doc.data().displayName }} - {{ item.payload.doc.data().email }}
+                </b>
+              </div>
+              <div class="col-4">
+                <div align="right">
+                  <button class="btn btn-outline-primary btn-sm" (click)="verDetalhes(item.payload.doc.data().uid, i)">+
+                    Detalhes
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="card-body" *ngIf="i == iSelecionado">
+
+            <div class="spinner-grow text-info" role="status" *ngIf="loadingDisciplina">
+              <span class="sr-only">Loading...</span>
+            </div>
+            <div *ngIf="dadosDisciplinas">
+              <table class="table">
+                <thead>
+                <tr>
+                  <th scope="col">Nome</th>
+                  <th scope="col">#</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr *ngFor="let item of dadosDisciplinas">
+                  <td>
+                    {{ item.payload.doc.data().nome }}
+                  </td>
+                  <td>
+                    <button class="btn btn-primary btn-sm" [routerLink]="['/prof/plan', item.payload.doc.id]">
+                      Ver Planejamento do Professor
+                    </button>
+                  </td>
+                </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+
+    </div>
+  </div>
+</main>
+

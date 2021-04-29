@@ -1,0 +1,47 @@
+<div style="margin-top: 5px">
+
+  <ul class="nav justify-content-end nav-pills">
+    <li class="nav-item" style="cursor:pointer;">
+      <a class="nav-link " [ngClass]="{'active': modoExibicao == 0}"
+         (click)="alterarModoExibicao(0)">Unidades</a>
+    </li>
+    <li class="nav-item" style="cursor:pointer;">
+      <a class="nav-link" [ngClass]="{'active': modoExibicao == 1}"
+         (click)="alterarModoExibicao(1)">Unidades +
+        Aulas</a>
+    </li>
+    <li class="nav-item" style="cursor:pointer;">
+      <a class="nav-link" [ngClass]="{'active': modoExibicao == 2}"
+         (click)="alterarModoExibicao(2)">Somente Aulas</a>
+    </li>
+  </ul>
+</div>
+
+<div *ngIf="!loading">
+  <div *ngIf="modoExibicao == 0">
+    <table style="margin-top: 5px;">
+      <tbody>
+      <tr *ngFor="let item of blocosExibirPorEpisodio">
+        <td class="blocoVazio" *ngFor="let itemBranco of item.anteriorTotal"></td>
+        <td *ngFor="let itemBloco of item.blocos" class="bloco" title="{{itemBloco.nomeCompleto}}">
+          {{itemBloco.nome}}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngIf="modoExibicao == 1 || modoExibicao == 2">
+    <table style="margin-top: 5px;">
+      <tbody>
+      <tr *ngFor="let item of blocosExibirPorEpisodio">
+        <td class="blocoVazio" *ngFor="let itemBranco of item.anteriorTotal"></td>
+        <td *ngFor="let itemBloco of item.blocos" title="{{itemBloco.nomeCompleto}}"
+            [ngClass]="{'bloco': itemBloco.tipo == 0, 'blocoRecurso': itemBloco.tipo == 1}">
+          {{itemBloco.nome }}
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

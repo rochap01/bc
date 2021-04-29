@@ -1,0 +1,49 @@
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+
+    <div class="displayTable">
+      <div class="displayTableCell">
+
+        <div class="row">
+          <div class="col-lg-3">
+
+          </div>
+          <div class="col-lg-6">
+            <div class="authBlock">
+              <h3>Entrar na conta</h3>
+              <div class="form-group">
+                <input type="text" class="form-control" placeholder="Digite o e-mail" #userName required>
+              </div>
+
+              <div class="form-group">
+                <input type="password" class="form-control" placeholder="Digite a senha" #userPassword required>
+              </div>
+
+              <!-- Calling SignIn Api from AuthService -->
+              <div class="form-group">
+                <input type="button" class="btn btn-primary btn-block" value="Log in" [disabled]="authService.criando"
+                       (click)="authService.SignIn(userName.value, userPassword.value)">
+              </div>
+              <div class="spinner-grow text-info" role="status" *ngIf="authService.criando">
+                <span class="sr-only">Loading...</span>
+              </div>
+
+
+              <div class="btn btn-link">
+                <span routerLink="/forgot-password">Esqueceu a senha?</span>
+              </div>
+            </div>
+
+            <div class="redirectToLogin">
+              <span>Não tem uma conta?<span class="redirect btn btn-link"
+                                            routerLink="/register-user"> Fazer Cadastro</span></span>
+            </div>
+          </div>
+          <div class="col-lg-3">
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
